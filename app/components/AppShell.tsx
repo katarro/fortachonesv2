@@ -210,7 +210,7 @@ export default function AppShell({ user, allUsers, route, notifKey, onNavigate, 
     <>
       <header className="topbar gutter">
         <div className="inner">
-          <button className="icon-btn" type="button" aria-label="Abrir menú"
+          <button id="menu-open" className="icon-btn" type="button" aria-label="Abrir menú"
             aria-haspopup="dialog" onClick={() => navDialogRef.current?.showModal()}>
             <svg className="icon"><use href="#i-menu"/></svg>
           </button>
@@ -245,7 +245,7 @@ export default function AppShell({ user, allUsers, route, notifKey, onNavigate, 
       </div>
 
       {/* Nav drawer */}
-      <dialog ref={navDialogRef} aria-label="Menú de navegación"
+      <dialog id="nav-drawer" ref={navDialogRef} aria-label="Menú de navegación"
         onClick={e => { if ((e.target as Element) === e.currentTarget || (e.target as Element).closest('[data-tab], #logout-btn')) navDialogRef.current?.close(); }}>
         <div className="drawer">
           <div className="drawer-head">
@@ -282,12 +282,6 @@ export default function AppShell({ user, allUsers, route, notifKey, onNavigate, 
           </div>
         </div>
       </dialog>
-
-      {/* Theme toggle floating */}
-      <button className="icon-btn theme-float" type="button" aria-label="Cambiar entre modo claro y oscuro"
-        onClick={toggleTheme}>
-        <svg className="icon" aria-hidden="true"><use href={isDark ? '#i-sun' : '#i-moon'}/></svg>
-      </button>
 
       {/* Notifications dialog */}
       <dialog ref={notifDialogRef} aria-labelledby="notif-title" onClose={() => setNotifOpen(false)}
