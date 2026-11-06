@@ -1,9 +1,9 @@
 'use client';
 
-import { useRef, useEffect, useCallback } from 'react';
+import { useRef, useEffect, useCallback, useState } from 'react';
 import type { Account, Expense, User } from '../lib/types';
 import { Format, getMonthDateRange } from '../lib/format';
-import { upsertExpense } from '../lib/services';
+import { upsertExpense, deleteExpense } from '../lib/services';
 import PhotoField, { type PhotoFieldRef } from './PhotoField';
 
 interface Props {
@@ -13,14 +13,17 @@ interface Props {
   expenses: Expense[];
   user: User;
   onSaved: () => void;
+  onDeleted: () => void;
   onClose: () => void;
 }
 
-export default function ExpenseModal({ accountId, month, accounts, expenses, user, onSaved, onClose }: Props) {
+export default function ExpenseModal({ accountId, month, accounts, expenses, user, onSaved, onDeleted, onClose }: Props) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const photoRef = useRef<PhotoFieldRef>(null);
   const amountRef = useRef<HTMLInputElement>(null);
   const dateRef = useRef<HTMLInputElement>(null);
+  const [saving, setSaving] = useState(false);
+  const [confirming, setConfirming] = useState(false);
 
   const isOpen = accountId !== null && month !== null;
   const account = accounts.find(a => a.id === accountId);
@@ -30,6 +33,7 @@ export default function ExpenseModal({ accountId, month, accounts, expenses, use
     const dialog = dialogRef.current;
     if (!dialog) return;
     if (isOpen) {
+      setConfirming(false);
       dialog.showModal();
       const { min, max } = getMonthDateRange(month!);
       if (amountRef.current) amountRef.current.value = existing ? String(existing.amount) : '';
@@ -49,22 +53,39 @@ export default function ExpenseModal({ accountId, month, accounts, expenses, use
     onClose();
   }, [onClose]);
 
+  async function handleDelete() {
+    if (!existing) return;
+    setSaving(true);
+    try {
+      await deleteExpense(existing.id);
+      dialogRef.current?.close();
+      onDeleted();
+    } finally {
+      setSaving(false);
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!accountId || !month) return;
-    const amount = Number(amountRef.current?.value);
-    const date = dateRef.current?.value ?? '';
-    await upsertExpense({
-      accountId,
-      month,
-      amount,
-      date,
-      photoUrl: photoRef.current?.value ?? null,
-      authorId: user.id,
-      existingId: existing?.id,
-    });
-    dialogRef.current?.close();
-    onSaved();
+    if (!accountId || !month || saving) return;
+    setSaving(true);
+    try {
+      const amount = Number(amountRef.current?.value);
+      const date = dateRef.current?.value ?? '';
+      await upsertExpense({
+        accountId,
+        month,
+        amount,
+        date,
+        photoUrl: photoRef.current?.value ?? null,
+        authorId: user.id,
+        existingId: existing?.id,
+      });
+      dialogRef.current?.close();
+      onSaved();
+    } finally {
+      setSaving(false);
+    }
   }
 
   if (!account || !month) return null;
@@ -98,11 +119,22 @@ export default function ExpenseModal({ accountId, month, accounts, expenses, use
           </svg>
           <span>Se guardará a nombre de {user.display_name}</span>
         </div>
-        <div className="modal-actions">
-          <button className="btn btn-ghost" type="button"
-            onClick={() => dialogRef.current?.close()}>Cancelar</button>
-          <button className="btn" type="submit">Guardar cuenta</button>
-        </div>
+        {confirming ? (
+          <div className="modal-actions">
+            <p className="confirm-text" style={{ flex: '1 1 100%' }}>¿Quitar esta cuenta? No se puede deshacer.</p>
+            <button className="btn btn-ghost" type="button" disabled={saving} onClick={() => setConfirming(false)}>No, conservar</button>
+            <button className="btn btn-danger" type="button" disabled={saving} onClick={handleDelete}>{saving ? 'Quitando…' : 'Sí, quitar'}</button>
+          </div>
+        ) : (
+          <div className="modal-actions">
+            {existing && (
+              <button className="btn btn-danger" type="button" disabled={saving} onClick={() => setConfirming(true)}>Quitar cuenta</button>
+            )}
+            <button className="btn btn-ghost" type="button" disabled={saving}
+              onClick={() => dialogRef.current?.close()}>Cancelar</button>
+            <button className="btn" type="submit" disabled={saving}>{saving ? 'Guardando…' : 'Guardar cuenta'}</button>
+          </div>
+        )}
       </form>
     </dialog>
   );

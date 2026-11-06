@@ -101,6 +101,10 @@ export async function upsertExpense(params: {
   return data ?? null;
 }
 
+export async function deleteExpense(id: number) {
+  await supabase.from('expenses').delete().eq('id', id);
+}
+
 // --- Tasks ---
 
 export async function getTasks(): Promise<Task[]> {

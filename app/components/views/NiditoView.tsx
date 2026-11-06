@@ -156,6 +156,7 @@ function TaskModal({ taskId, tasks, user, allUsers, onSaved, onClose, showToast 
   const titleRef = useRef<HTMLInputElement>(null);
   const descRef = useRef<HTMLTextAreaElement>(null);
   const doneRef = useRef<HTMLInputElement>(null);
+  const [saving, setSaving] = useState(false);
   const isOpen = taskId !== null;
   const isNew = taskId === 'new';
   const task = typeof taskId === 'number' ? tasks.find(t => t.id === taskId) : undefined;
@@ -177,22 +178,28 @@ function TaskModal({ taskId, tasks, user, allUsers, onSaved, onClose, showToast 
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const title = titleRef.current?.value.trim() ?? '';
-    const description = descRef.current?.value.trim() ?? '';
-    const photo = photoRef.current?.value ?? null;
-    if (isNew) {
-      const partner = allUsers.find(u => u.id !== user.id);
-      const saved = await addTask({ title, description, photoUrl: photo, authorId: user.id, date: Format.isoDate(new Date()) });
-      if (!saved) return;
-      dialogRef.current?.close();
-      showToast(`Agregado. Le avisamos a ${partner?.display_name ?? 'tu pareja'}.`);
-      onSaved(saved, true);
-    } else if (task) {
-      const saved = await updateTask(task.id, { title, description, done: doneRef.current?.checked ?? false, photo_url: photo });
-      if (!saved) return;
-      dialogRef.current?.close();
-      showToast('Cambios guardados');
-      onSaved(saved, false);
+    if (saving) return;
+    setSaving(true);
+    try {
+      const title = titleRef.current?.value.trim() ?? '';
+      const description = descRef.current?.value.trim() ?? '';
+      const photo = photoRef.current?.value ?? null;
+      if (isNew) {
+        const partner = allUsers.find(u => u.id !== user.id);
+        const saved = await addTask({ title, description, photoUrl: photo, authorId: user.id, date: Format.isoDate(new Date()) });
+        if (!saved) return;
+        dialogRef.current?.close();
+        showToast(`Agregado. Le avisamos a ${partner?.display_name ?? 'tu pareja'}.`);
+        onSaved(saved, true);
+      } else if (task) {
+        const saved = await updateTask(task.id, { title, description, done: doneRef.current?.checked ?? false, photo_url: photo });
+        if (!saved) return;
+        dialogRef.current?.close();
+        showToast('Cambios guardados');
+        onSaved(saved, false);
+      }
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -230,8 +237,8 @@ function TaskModal({ taskId, tasks, user, allUsers, onSaved, onClose, showToast 
           <span>{task ? `Agregado por ${author.display_name}` : `Se guardará a nombre de ${author.display_name}`}</span>
         </div>
         <div className="modal-actions">
-          <button className="btn btn-ghost" type="button" onClick={() => dialogRef.current?.close()}>Cancelar</button>
-          <button className="btn" type="submit">Guardar</button>
+          <button className="btn btn-ghost" type="button" disabled={saving} onClick={() => dialogRef.current?.close()}>Cancelar</button>
+          <button className="btn" type="submit" disabled={saving}>{saving ? 'Guardando…' : 'Guardar'}</button>
         </div>
       </form>
     </dialog>

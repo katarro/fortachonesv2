@@ -47,6 +47,13 @@ export default function CuentasView({ user, allUsers, isActive, showToast }: Pro
     fetchData();
   }
 
+  function handleDeleted() {
+    const acc = accounts.find(a => a.id === modal?.accountId);
+    showToast(`${acc?.name ?? 'Cuenta'} quitada`);
+    setModal(null);
+    fetchData();
+  }
+
   if (loading) return <div className="gutter"><main className="inner single" /></div>;
 
   return (
@@ -89,6 +96,7 @@ export default function CuentasView({ user, allUsers, isActive, showToast }: Pro
         expenses={expenses}
         user={user}
         onSaved={handleSaved}
+        onDeleted={handleDeleted}
         onClose={() => setModal(null)}
       />
     </>
