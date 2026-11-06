@@ -43,6 +43,11 @@ export default function IconSprite() {
       <symbol id="i-exit" viewBox="0 0 24 24">
         <path d="M10 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h5M15 8l4 4-4 4M19 12H9"/>
       </symbol>
+      <symbol id="i-image" viewBox="0 0 24 24">
+        <rect x="3" y="3" width="18" height="18" rx="2"/>
+        <circle cx="8.5" cy="8.5" r="1.5"/>
+        <path d="M21 15l-5-5L5 21"/>
+      </symbol>
 
       <symbol id="face-a" viewBox="0 0 120 120">
         <path fill="var(--hair-a)" d="M56 10C24 10 6 36 9 68c1 16-3 28-6 40 14 7 32 4 42-6h20V30z"/>

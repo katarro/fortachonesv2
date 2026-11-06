@@ -56,18 +56,32 @@ const PhotoField = forwardRef<PhotoFieldRef, Props>(function PhotoField({ inputI
   return (
     <div className="photo-field">
       {!value ? (
-        <label className="photo-drop" htmlFor={inputId}>
-          <svg className="icon" aria-hidden="true"><use href="#i-camera"/></svg>
-          <span>Subir o tomar una foto</span>
-          <input
-            ref={fileRef}
-            className="photo-input"
-            id={inputId}
-            type="file"
-            accept="image/*"
-            onChange={(e) => handleFile(e.target.files?.[0])}
-          />
-        </label>
+        <div className="photo-drop">
+          <label className="photo-drop-btn" htmlFor={inputId}>
+            <svg className="icon" aria-hidden="true"><use href="#i-image"/></svg>
+            <span>Galería</span>
+            <input
+              ref={fileRef}
+              className="photo-input"
+              id={inputId}
+              type="file"
+              accept="image/*"
+              onChange={(e) => handleFile(e.target.files?.[0])}
+            />
+          </label>
+          <label className="photo-drop-btn" htmlFor={`${inputId}-cam`}>
+            <svg className="icon" aria-hidden="true"><use href="#i-camera"/></svg>
+            <span>Cámara</span>
+            <input
+              className="photo-input"
+              id={`${inputId}-cam`}
+              type="file"
+              accept="image/*"
+              capture="environment"
+              onChange={(e) => handleFile(e.target.files?.[0])}
+            />
+          </label>
+        </div>
       ) : (
         <div className="photo-preview">
           <img src={value} alt="Vista previa de la foto" />

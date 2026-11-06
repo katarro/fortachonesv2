@@ -16,6 +16,7 @@ import SuperduperView from './components/views/SuperduperView';
 
 export default function FortachonesApp() {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
   const [allUsers, setAllUsers] = useState<User[]>([]);
   const [route, setRoute] = useState<Route>('cuentas');
   const [toast, setToast] = useState<{ msg: string; key: number } | null>(null);
@@ -30,6 +31,7 @@ export default function FortachonesApp() {
         const profiles = await getAllProfiles();
         setAllUsers(profiles);
       }
+      setLoading(false);
     });
   }, []);
 
@@ -80,6 +82,8 @@ export default function FortachonesApp() {
     navigate('nidito');
     setOpenTaskId(taskId);
   }
+
+  if (loading) return null;
 
   if (!user) {
     return (

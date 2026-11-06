@@ -106,9 +106,10 @@ input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px
 .chip[aria-pressed="true"] { background: var(--purple); border-color: var(--purple); color: var(--on-accent); font-weight: 600; }
 
 .photo-field { display: grid; gap: 8px; }
-.photo-drop { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 64px; padding: 10px; border: 1.5px dashed var(--purple); border-radius: 12px; color: var(--purple); font-weight: 600; font-size: .92rem; cursor: pointer; text-align: center; }
-.photo-drop:hover { background: var(--purple-soft); }
-.photo-drop:focus-within { outline: 3px solid var(--purple); outline-offset: 2px; }
+.photo-drop { display: flex; gap: 8px; }
+.photo-drop-btn { display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-height: 64px; padding: 10px; border: 1.5px dashed var(--purple); border-radius: 12px; color: var(--purple); font-weight: 600; font-size: .92rem; cursor: pointer; text-align: center; }
+.photo-drop-btn:hover { background: var(--purple-soft); }
+.photo-drop-btn:focus-within { outline: 3px solid var(--purple); outline-offset: 2px; }
 .photo-input { position: absolute; width: 1px; height: 1px; opacity: 0; }
 .photo-preview { position: relative; }
 .photo-preview img { width: 100%; max-height: 180px; object-fit: cover; border-radius: 12px; display: block; }
