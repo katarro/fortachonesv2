@@ -89,6 +89,12 @@ export default function HistoricoView({ user, allUsers, isActive, showToast }: P
     fetchData();
   }
 
+  function handleDeleted() {
+    showToast('Eliminado');
+    setModal(null);
+    fetchData();
+  }
+
   if (loading) return <div className="gutter"><main className="inner single" /></div>;
 
   return (
@@ -213,6 +219,7 @@ export default function HistoricoView({ user, allUsers, isActive, showToast }: P
         expenses={expenses}
         user={user}
         onSaved={handleSaved}
+        onDeleted={handleDeleted}
         onClose={() => setModal(null)}
       />
     </>
